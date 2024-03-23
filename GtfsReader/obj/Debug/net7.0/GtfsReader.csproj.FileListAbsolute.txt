@@ -22,3 +22,15 @@ I:/Projekte/GtfsReader/GtfsReader/obj/Debug/net7.0/ref/GtfsReader.dll
 /home/ferdinand/Documents/Projects/GtfsReader/GtfsReader/obj/Debug/net7.0/refint/GtfsReader.dll
 /home/ferdinand/Documents/Projects/GtfsReader/GtfsReader/obj/Debug/net7.0/GtfsReader.pdb
 /home/ferdinand/Documents/Projects/GtfsReader/GtfsReader/obj/Debug/net7.0/ref/GtfsReader.dll
+I:\Projekte\GtfsReader\GtfsReader\bin\Debug\net7.0\GtfsReader.deps.json
+I:\Projekte\GtfsReader\GtfsReader\bin\Debug\net7.0\GtfsReader.dll
+I:\Projekte\GtfsReader\GtfsReader\bin\Debug\net7.0\GtfsReader.pdb
+I:\Projekte\GtfsReader\GtfsReader\obj\Debug\net7.0\GtfsReader.GeneratedMSBuildEditorConfig.editorconfig
+I:\Projekte\GtfsReader\GtfsReader\obj\Debug\net7.0\GtfsReader.AssemblyInfoInputs.cache
+I:\Projekte\GtfsReader\GtfsReader\obj\Debug\net7.0\GtfsReader.AssemblyInfo.cs
+I:\Projekte\GtfsReader\GtfsReader\obj\Debug\net7.0\GtfsReader.csproj.CoreCompileInputs.cache
+I:\Projekte\GtfsReader\GtfsReader\obj\Debug\net7.0\GtfsReader.sourcelink.json
+I:\Projekte\GtfsReader\GtfsReader\obj\Debug\net7.0\GtfsReader.dll
+I:\Projekte\GtfsReader\GtfsReader\obj\Debug\net7.0\refint\GtfsReader.dll
+I:\Projekte\GtfsReader\GtfsReader\obj\Debug\net7.0\GtfsReader.pdb
+I:\Projekte\GtfsReader\GtfsReader\obj\Debug\net7.0\ref\GtfsReader.dll
