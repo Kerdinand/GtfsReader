@@ -1,4 +1,5 @@
 ﻿using GtfsReader.Structures;
+using GtfsReader.Util;
 
 namespace GtfsReader;
 
@@ -24,16 +25,15 @@ public class Reader
     {
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "stops.txt"))
         {
-            streamReader.ReadLine();
+            string[] keys = streamReader.ReadLine().ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {
-                string[] c = Util.Util.GetValuesFromCsvLine(line);
-                _stops[c[0]] = new Stop(c[0], c[1], c[2].Replace('.',','), c[3].Replace('.',','), c[4], c[5], c[6], c[7]);
+                Stop newStop = new Stop(keys, line.ToValuesFromCsvLine());
+                _stops[newStop.stop_id] = newStop;
                 line = streamReader.ReadLine();
             }
         }
-
         return _stops;
     }
 

@@ -26,7 +26,22 @@ public static class Util
 
         return result.ToArray();
     }
+
+    public static string[] ToValuesFromCsvLine(this string input)
+    {
+        return GetValuesFromCsvLine(input);
+    }
     
+    public static Dictionary<string, string> ToCsvKeyDictionary(this string line)
+    {
+        string[] keys = GetValuesFromCsvLine(line);
+        Dictionary<string, string> result = new Dictionary<string, string>();
+        foreach (var keyValue in keys)
+        {
+            result.Add(keyValue, "");
+        }
+        return result;
+    }
     public static DateOnly CreateDateFromString(string input)
     {
         if (input == "") throw new ArgumentException();
