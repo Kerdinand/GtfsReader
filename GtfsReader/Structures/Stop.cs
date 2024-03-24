@@ -6,12 +6,19 @@ public class Stop
 {
     public string stop_id { get; set; }
     public string stop_name { get; set; }
+    public string stop_code { get; set; }
+    public string tts_stop_name { get; set; }
+    public string stop_desc { get; set; }
     public double stop_lat { get; set; }
     public double stop_lon { get; set; }
     public string zone_id { get; set; }
     public string stop_url { get; set; }
-    public byte location_type { get; set; } = 0;
-    public string parent_station { get; set; } = "";
+    public byte location_type { get; set; }
+    public string parent_station { get; set; }
+    public string stop_timezone { get; set; }
+    public byte wheelchair_boarding { get; set; }
+    public sbyte level_id { get; set; }
+    public string platform_code { get; set; }
     public Stop? parent_Stop { get; set; }
     public List<Stop> children_stops { get; } = new List<Stop>();
 
@@ -24,23 +31,7 @@ public class Stop
     public Label label { get; }
     
     public Stop parentStop { get; set; }
-    
-    [Obsolete]
-    public Stop(string stopId, string stopName, string stopLat, string stopLon, string zoneId, string stopUrl, string locationType, string parentStation)
-    {
-        stop_id = stopId;
-        stop_name = stopName;
-        stop_lat = double.Parse(stopLat) ;
-        stop_lon = double.Parse(stopLon);
-        zone_id = zoneId;
-        stop_url = stopUrl;
-        if (locationType == "") locationType = "100";
-        location_type = byte.Parse(locationType);
-        parent_station = parentStation;
-        timeTable = new TimeTable(this);
-        label = new Label();
-    } 
-    
+
     /// <summary>
     /// Creates new Stop. Including new Label and new TimeTable.
     /// </summary>
@@ -56,8 +47,12 @@ public class Stop
                 case "stop_lon":
                     this.GetType().GetProperty(keys[i]).SetValue(this, double.Parse(values[i].Replace('.',','))); break;
                 case "location_type":
+                case "wheelcharair_boarding":
                     if (values[i] == "") values[i] = "100";
                     this.GetType().GetProperty(keys[i]).SetValue(this, byte.Parse(values[i])); break;
+                case "level_id":
+                    if (values[i] == "") values[i] = "0";
+                    this.GetType().GetProperty(keys[i]).SetValue(this, sbyte.Parse(values[i])); break;
                 default:
                     this.GetType().GetProperty(keys[i]).SetValue(this, values[i], null);
                     break;

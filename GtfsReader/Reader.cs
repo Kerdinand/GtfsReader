@@ -143,12 +143,12 @@ public class Reader
     {
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "agency.txt"))
         {
-            streamReader.ReadLine();
+            string[] keys = streamReader.ReadLine().ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {
-                string[] c = Util.Util.GetValuesFromCsvLine(line);
-                _agencies[c[0]] = new Agency(c[0], c[1], c[2], c[3], c[4], c[5]);
+                Agency newAgency = new Agency(keys, line.ToValuesFromCsvLine());
+                _agencies[newAgency.agency_id] = newAgency;
                 line = streamReader.ReadLine();
             }
         }
