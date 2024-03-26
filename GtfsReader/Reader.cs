@@ -25,7 +25,7 @@ public class Reader
     {
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "stops.txt"))
         {
-            string[] keys = streamReader.ReadLine().ToValuesFromCsvLine();
+            string[] keys = streamReader.ReadLine()!.ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {
@@ -41,23 +41,11 @@ public class Reader
     {
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "stop_times.txt"))
         {
-            streamReader.ReadLine();
+            string[]? keys = streamReader.ReadLine()!.ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {
-                string[] c = Util.Util.GetValuesFromCsvLine(line);
-                StopTime s = new StopTime(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7]);
-                if (_stopTimes.ContainsKey(c[0]))
-                {
-                    _stopTimes[c[0]].Add(s);
-                }
-                else
-                {
-                    List<StopTime> tmp = new List<StopTime>();
-                    tmp.Add(s);
-                    _stopTimes[c[0]] = tmp;
-                }
-
+                StopTime newStopTime = new StopTime()
                 line = streamReader.ReadLine();
             }
         }
@@ -143,7 +131,7 @@ public class Reader
     {
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "agency.txt"))
         {
-            string[] keys = streamReader.ReadLine().ToValuesFromCsvLine();
+            string[] keys = streamReader.ReadLine()!.ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {

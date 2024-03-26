@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net7.0;net8.0;net8.0-windows</TargetFrameworks>
+        <TargetFrameworks>net7.0</TargetFrameworks>
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 

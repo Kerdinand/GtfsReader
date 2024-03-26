@@ -56,6 +56,11 @@ public static class Util
         }
         else return input;
     }
+
+    public static TimeOnly ToTimeOnly(this string input)
+    {
+        return TimeOnly.Parse(FormatStringToTimeString(input));
+    }
     
     public static double CalculateDistance(double sLatitude, double sLongitude, double eLatitude, double eLongitude)
     {

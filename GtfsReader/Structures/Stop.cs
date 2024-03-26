@@ -38,7 +38,8 @@ public class Stop
     /// <param name="keys">Array of keys (var names)</param>
     /// <param name="values">Array of values for each attribute</param>
     public Stop(string[] keys, string[] values)
-    {for (int i = 0; i < keys.Length; i++)
+    {
+        for (int i = 0; i < keys.Length; i++)
         {
             if (this.GetType().GetProperty(keys[i]) == null) continue;
             switch (keys[i])
