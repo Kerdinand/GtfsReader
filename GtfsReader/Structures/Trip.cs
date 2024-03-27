@@ -14,6 +14,7 @@ public class Trip
     public string shape_id { get; set; }
     public byte wheelchair_accessible { get; set; }
     public byte bikes_allowed { get; set; }
+    public string trip_load_information { get; set; }
 
     public List<StopTime> intermediateStops;
     public Stop destination;

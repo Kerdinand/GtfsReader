@@ -20,6 +20,7 @@ public class Transfer
             switch (keys[i])
             {
                 case "transfer_type":
+                    if (values[i] == "") values[i] = "1";
                     this.GetType().GetProperty(keys[i]).SetValue(this, byte.Parse(values[i])); break;
                 case "min_transfer_time":
                     if (values[i] == "") values[i] = "120";

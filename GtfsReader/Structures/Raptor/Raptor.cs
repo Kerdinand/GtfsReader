@@ -283,7 +283,7 @@ public class Raptor
             newTime = newTime.AddDays(1);
         }
 
-        return labelTime > newTime;
+        return labelTime >= newTime;
     }
     
     public List<Stop> GetQuickestRoute(Stop start, DateTime startTime, int numberOfRounds, int maximumWaitingTime, Stop end)
@@ -299,7 +299,7 @@ public class Raptor
         HashSet<Stop> markedStops = new HashSet<Stop>();
         markedStops.Add(start);
         start.label.arrivalTime = startTime;
-
+        /*
         for (int i = 0; i < start.stopsCloseBy.Count; i++)
         {
             Stop currentStop = start.stopsCloseBy[i].parentStop;
@@ -310,7 +310,7 @@ public class Raptor
             start.label.departureTime = currentStop.label.arrivalTime.AddMinutes(-(start.stopsCloseByTime[i]+1));
             markedStops.Add(currentStop);
         }
-        
+        */
 
         for (int index = 0; index < numberOfRounds; index++)
         {
@@ -318,16 +318,17 @@ public class Raptor
             foreach (Stop stop in markedStops)
             {
                 List<TimeTableTrip> departingTrips =
-                    GetDepartingTrips(stop.label.arrivalTime, maximumWaitingTime, stop);
+                    GetEarliestDepartingTrips(stop.label.arrivalTime, maximumWaitingTime, stop);
                 foreach (TimeTableTrip trip in departingTrips)
                 {
                     foreach (StopTime stopTime in trip.intermediateStops)
                     {
                         Stop currentStop = _stops[stopTime.stop_id].parentStop;
                         if (currentStop.stop_id == start.stop_id) continue;
-                        if (!isEarlierTime(currentStop.label.arrivalTime, stopTime.arrival_time, originalStartTime)) continue;
+                        if (!isEarlierTime(currentStop.label.arrivalTime, stopTime.arrival_time.AddMinutes(1), originalStartTime)) continue;
+                        if (currentStop.label.exitTrip != null && currentStop.label.exitTrip.GetIdentStringSimple() == trip.GetIdentStringSimple()) continue;
                         currentStop.label.arrivalTime = new DateTime(startTime.Year, startTime.Month, startTime.Day,
-                            stopTime.arrival_time.Hour, stopTime.arrival_time.Minute, stopTime.arrival_time.Second).AddMinutes(1);
+                            stopTime.arrival_time.Hour, stopTime.arrival_time.Minute, stopTime.arrival_time.Second).AddMinutes(2);
                         if (currentStop.label.arrivalTime < originalStartTime)
                         {
                             currentStop.label.arrivalTime = currentStop.label.arrivalTime.AddDays(1);
@@ -385,15 +386,15 @@ public class Raptor
             markedStops = new HashSet<Stop>(updatedStops);
             updatedStops.Clear();
         }
-
+        
         List<Stop> stopsNearEnd = GetStopsInVicinity(end.parentStop, 1);
 
         foreach (Stop s in stopsNearEnd)
         {
             if (s.label.arrivalTime == DateTime.MaxValue) continue;
-            if (end.label.arrivalTime > s.label.arrivalTime.AddMinutes(Util.Util.CalculateDistance(end, s) * 15))
+            if (end.label.arrivalTime > s.label.arrivalTime.AddMinutes(Util.Util.CalculateDistance(end, s) * 20))
             {
-                end.label.arrivalTime = s.label.arrivalTime.AddMinutes(Util.Util.CalculateDistance(end, s) * 15);
+                end.label.arrivalTime = s.label.arrivalTime.AddMinutes(Util.Util.CalculateDistance(end, s) * 20);
                 end.label.origin = s;
                 end.label.exitTrip = null;
             }
@@ -437,6 +438,7 @@ public class Raptor
             {
                 line = "Transfer";
             }
+            
             if (nextStop.label.exitTrip != null)
             {
                 string headSign = _stops[(nextStop.label.exitTrip.intermediateStops[^1].stop_id)].stop_name;
@@ -445,7 +447,7 @@ public class Raptor
                     headSign = nextStop.label.exitTrip.trip.trip_headsign;
                 }
 
-                line = nextStop.label.exitTrip.route.route_short_name + " nach: " + headSign;
+                line = nextStop.label.exitTrip.route.route_short_name + " nach: " + headSign + " " + nextStop.label.exitTrip.trip.trip_id;
                 depTime = nextStop.label.exitTrip.GetDepartureTime().ToString();
             }
 
