@@ -1,4 +1,5 @@
-﻿using GtfsReader.Structures;
+﻿using System.Net;
+using GtfsReader.Structures;
 using GtfsReader.Util;
 
 namespace GtfsReader;
@@ -39,13 +40,22 @@ public class Reader
 
     public Dictionary<string, List<StopTime>> ReadStopTimes()
     {
+        
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "stop_times.txt"))
         {
-            string[]? keys = streamReader.ReadLine()!.ToValuesFromCsvLine();
+            string[] keys = streamReader.ReadLine()!.ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {
-                StopTime newStopTime = new StopTime()
+                StopTime newStopTime = new StopTime(keys, line.ToValuesFromCsvLine());
+                if (_stopTimes.ContainsKey(newStopTime.trip_id))
+                {
+                    _stopTimes[newStopTime.trip_id].Add(newStopTime);
+                }
+                else
+                {
+                    _stopTimes[newStopTime.trip_id] = new List<StopTime>(new[] { newStopTime });
+                }
                 line = streamReader.ReadLine();
             }
         }
@@ -54,14 +64,15 @@ public class Reader
 
     public List<Transfer> ReadTransfers()
     {
+        if (!File.Exists(_baseDirectory + "transfers.txt")) return _transfers;
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "transfers.txt"))
         {
-            streamReader.ReadLine();
+            string[] keys = streamReader.ReadLine().ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {
-                string[] c = Util.Util.GetValuesFromCsvLine(line);
-                _transfers.Add(new Transfer(c[0],c[1],c[2],c[3]));
+                Transfer newTransfer = new Transfer(keys, line.ToValuesFromCsvLine());
+                _transfers.Add(newTransfer);
                 line = streamReader.ReadLine();
             }
         }
@@ -70,14 +81,15 @@ public class Reader
 
     public Dictionary<string, Calendar> ReadCalendars()
     {
+        if (!File.Exists(_baseDirectory + "calendar.txt")) return _calendars;
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "calendar.txt"))
         {
-            streamReader.ReadLine();
+            string[] keys = streamReader.ReadLine().ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {
-                string[] c = Util.Util.GetValuesFromCsvLine(line);
-                _calendars[c[0]] = new Calendar(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8], c[9]);
+                Calendar newCalendar = new Calendar(keys, line.ToValuesFromCsvLine());
+                _calendars[newCalendar.service_id] = newCalendar;
                 line = streamReader.ReadLine();
             }
         }
@@ -86,25 +98,22 @@ public class Reader
 
     public Dictionary<string, List<CalendarDate>> ReadCalendarDate()
     {
+        if (!File.Exists(_baseDirectory + "calendar_dates.txt")) return _calendarDates;
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "calendar_dates.txt"))
         {
-            streamReader.ReadLine();
+            string[] keys = streamReader.ReadLine().ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {
-                string[] c = Util.Util.GetValuesFromCsvLine(line);
-                CalendarDate cd = new CalendarDate(c[0], c[1], c[2]);
-                if (_calendarDates.ContainsKey(c[0]))
+                CalendarDate newCalendarDate = new CalendarDate(keys, line.ToValuesFromCsvLine());
+                if (_calendarDates.ContainsKey(newCalendarDate.service_id))
                 {
-                    _calendarDates[c[0]].Add(cd);
+                    _calendarDates[newCalendarDate.service_id].Add(newCalendarDate);
                 }
                 else
                 {
-                    List<CalendarDate> tmp = new List<CalendarDate>();
-                    tmp.Add(cd);
-                    _calendarDates[c[0]] = tmp;
+                    _calendarDates[newCalendarDate.service_id] = new List<CalendarDate>(new[] {newCalendarDate});
                 }
-
                 line = streamReader.ReadLine();
             }
         }
@@ -115,12 +124,12 @@ public class Reader
     {
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "trips.txt"))
         {
-            streamReader.ReadLine();
+            string[] keys = streamReader.ReadLine().ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {
-                string[] c = Util.Util.GetValuesFromCsvLine(line);
-                _trips[c[2]] = new Trip(c[0], c[1], c[2], c[3], c[4], c[5], c[6]);
+                Trip newTrip = new Trip(keys, line.ToValuesFromCsvLine());
+                _trips[newTrip.trip_id] = newTrip;
                 line = streamReader.ReadLine();
             }
         }
@@ -147,15 +156,35 @@ public class Reader
     {
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "routes.txt"))
         {
-            streamReader.ReadLine();
+            string[] keys = streamReader.ReadLine().ToValuesFromCsvLine();
             string? line = streamReader.ReadLine();
             while (line != null)
             {
-                string[] c = Util.Util.GetValuesFromCsvLine(line);
-                _routes[c[0]] = new Route(c[0], c[1], c[2], c[3], c[4], c[5], c[6]);
+                Route newRoute = new Route(keys, line.ToValuesFromCsvLine());
+                _routes[newRoute.route_id] = newRoute;
                 line = streamReader.ReadLine();
             }
         }
         return _routes;
+    }
+
+    public void ReadAll()
+    {
+        ReadStops();
+        Console.WriteLine("Stops read.");
+        ReadStopTimes();
+        Console.WriteLine("StopTimes read");
+        ReadTransfers();
+        Console.WriteLine("Transfers read");
+        ReadCalendars();
+        Console.WriteLine("Calendars read");
+        ReadCalendarDate();
+        Console.WriteLine("CalendarDates read");
+        ReadTrips();
+        Console.WriteLine("Trips read");
+        ReadAgencies();
+        Console.WriteLine("Agencies read");
+        ReadRoutes();
+        Console.WriteLine("Routes read");
     }
 }

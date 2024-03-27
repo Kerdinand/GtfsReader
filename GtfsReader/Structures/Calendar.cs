@@ -1,30 +1,35 @@
+using GtfsReader.Util;
+
 namespace GtfsReader.Structures;
 
 public class Calendar
 {
-    public string service_id { get; }
-    public bool monday { get; }
-    public bool tuesday { get; }
-    public bool wednesday { get; }
-    public bool thursday { get; }
-    public bool friday { get; }
-    public bool saturday { get; }
-    public bool sunday { get; }
-    public DateOnly start_date { get; }
-    public DateOnly end_date {get;}
+    public string service_id { get; set; }
+    public bool monday { get; set; }
+    public bool tuesday { get; set; }
+    public bool wednesday { get; set; }
+    public bool thursday { get; set; }
+    public bool friday { get; set; }
+    public bool saturday { get; set; }
+    public bool sunday { get; set; }
+    public DateOnly start_date { get; set; }
+    public DateOnly end_date {get; set; }
 
-    public Calendar(string serviceId, string monday, string tuesday, string wednesday, string thursday, string friday, string saturday, string sunday, string startDate, string endDate)
+    public Calendar(string[] keys, string[] values)
     {
-        service_id = serviceId;
-        this.monday = monday == "1";
-        this.tuesday = tuesday == "1";
-        this.wednesday = wednesday == "1";
-        this.thursday = thursday == "1";
-        this.friday = friday == "1";
-        this.saturday = saturday == "1";
-        this.sunday = sunday== "1";
-        start_date = Util.Util.CreateDateFromString(startDate);
-        end_date = Util.Util.CreateDateFromString(endDate);
+        for (int i = 0; i < keys.Length; i++)
+        {
+            switch (keys[i])
+            {
+                case "start_date":
+                case "end_date":
+                    this.GetType().GetProperty(keys[i]).SetValue(this, values[i].ToDateOnly()); break;
+                case "service_id":
+                    this.GetType().GetProperty(keys[i]).SetValue(this, values[i]); break;
+                default:
+                    this.GetType().GetProperty(keys[i]).SetValue(this, values[i] == "1"); break;
+            }
+        }
     }
 
     public bool isRunningOnDay(DayOfWeek dayOfWeek)

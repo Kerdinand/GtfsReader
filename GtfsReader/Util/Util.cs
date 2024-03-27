@@ -23,7 +23,7 @@ public static class Util
                 currentValue = "";
             }
         }
-
+        if (input[^1] == ',') result.Add("");
         return result.ToArray();
     }
 
@@ -46,6 +46,11 @@ public static class Util
     {
         if (input == "") throw new ArgumentException();
         return DateOnly.Parse(input.Substring(0, 4) + "/" + input.Substring(4, 2) + "/" + input.Substring(6, 2));
+    }
+
+    public static DateOnly ToDateOnly(this string input)
+    {
+        return CreateDateFromString(input);
     }
     
     public static string FormatStringToTimeString(string input)

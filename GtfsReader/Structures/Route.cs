@@ -1,24 +1,38 @@
+using System.Reflection;
+
 namespace GtfsReader.Structures;
 
 public class Route
 {
-    public string route_id { get; }
-    public string agency_id { get; }
-    public string route_short_name { get; }
-    public string route_long_name { get; }
-    public byte route_type { get; }
-    public string route_color { get; }
-    public string route_text { get; }
+    public string route_id { get; set; }
+    public string agency_id { get; set; }
+    public string route_short_name { get; set; }
+    public string route_long_name { get; set; }
+    public string route_desc { get; set; }
+    public byte route_type { get; set; }
+    public string route_url { get; set; }
+    public string route_color { get; set; }
+    public string route_text_color { get; set; }
+    public ushort route_sort_order { get; set; }
+    public byte continuous_pickup { get; set; }
+    public byte continuous_drop_off { get; set; }
+    public string network_id { get; set; }
 
-    public Route(string routeId, string agencyId, string routeShortName, string routeLongName, string routeType, string routeColor, string routeText)
+    public Route(string[] keys, string[] values)
     {
-        route_id = routeId;
-        agency_id = agencyId;
-        route_short_name = routeShortName;
-        route_long_name = routeLongName;
-        if (routeType == "") routeType = "100";
-        route_type = byte.Parse(routeType);
-        route_color = routeColor;
-        route_text = routeText;
+        for (int i = 0; i < keys.Length; i++)
+        {
+            switch (keys[i])
+            {
+                case "route_type":
+                case "continuous_pickup":
+                case "continuous_drop_off":
+                    this.GetType().GetProperty(keys[i]).SetValue(this, byte.Parse(values[i])); break;
+                case "route_sort_order":
+                    this.GetType().GetProperty(keys[i]).SetValue(this, ushort.Parse(values[i])); break;
+                default:
+                    this.GetType().GetProperty(keys[i]).SetValue(this, values[i]); break;
+            }
+        }
     }
 }

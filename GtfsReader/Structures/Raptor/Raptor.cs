@@ -80,7 +80,7 @@ public class Raptor
     {
         foreach (Transfer transfer in _transfers)
         {
-            transfer.SetToStop(_stops[transfer.to_Stop_id]);
+            transfer.SetToStop(_stops[transfer.to_stop_id]);
             _stops[transfer.from_stop_id].AddTransfer(transfer);
         }
     }

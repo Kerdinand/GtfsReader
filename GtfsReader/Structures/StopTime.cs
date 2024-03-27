@@ -31,27 +31,24 @@ public class StopTime
                 case "departure_time":
                 case "start_pickup_drop_off_window":
                 case "end_pickup_drop_off_window":
-                    this.GetType().GetProperty(keys[i]).SetValue(this, values[i].ToTimeOnly()); break;
+                    this.GetType().GetProperty(keys[i]).SetValue(this, values[i].ToTimeOnly()); 
+                    break;
                 case "stop_sequence":
-                    this.GetType().GetProperty(keys[i]).SetValue(this, byte.Parse(values[i])); break;
+                    this.GetType().GetProperty(keys[i]).SetValue(this, byte.Parse(values[i])); 
+                    break;
+                case "shape_dist_traveled":
+                    this.GetType().GetProperty(keys[i]).SetValue(this, float.Parse(values[i].Replace('.',','))); break;
+                case "pickup_type":
+                case "drop_off_type":
+                case "timepoint":
+                    this.GetType().GetProperty(keys[i]).SetValue(this, values[i] == "1"); break;
                 default:
                     this.GetType().GetProperty(keys[i]).SetValue(this, values[i]);
+                    break;
             }
         }
     }
     
-    public StopTime(string tripId, string arrivalTime, string departureTime, string stopId, string stopSequence, string stopHeadsign, string pickupType, string dropOffType)
-    {
-        trip_id = tripId;
-        arrival_time = TimeOnly.Parse(Util.Util.FormatStringToTimeString(arrivalTime));
-        departure_time = TimeOnly.Parse(Util.Util.FormatStringToTimeString(departureTime));
-        stop_id = stopId;
-        stop_sequence =  byte.Parse(stopSequence);
-        stop_headsign = stopHeadsign;
-        pickup_type = pickupType == "1";
-        drop_off_type = dropOffType == "1";
-    }
-
     public void SetStop(Stop stop)
     {
         this.stop = stop;
