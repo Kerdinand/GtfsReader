@@ -21,8 +21,9 @@ public class TimeTable
         timeTableData.Sort((TimeTableTrip a, TimeTableTrip b) => a.CompareTo(b));
     }
 
-    public List<TimeTableTrip> GetDepartingTrips(DateTime currentTime ,int maximumWeightingTime)
+    public List<TimeTableTrip> GetDepartingTrips(DateTime internalTime ,int maximumWeightingTime, Dictionary<string, Calendar> calendars, Dictionary<string, List<CalendarDate>> calendarDates)
     {
+        DateTime currentTime = internalTime;
         TimeOnly time = TimeOnly.FromDateTime(currentTime);
         List<TimeTableTrip> tripsInTimeFrame = new List<TimeTableTrip>();
         if (time > time.AddHours(maximumWeightingTime))
@@ -30,12 +31,14 @@ public class TimeTable
             for (int i = 0; i < timeTableData.Count; i++)
             {
                 if (timeTableData[i].GetDepartureTime() < time) continue;
+                if (!timeTableData[i].TripIsRunning(DateOnly.FromDateTime(currentTime), calendars, calendarDates)) continue;
                 tripsInTimeFrame.Add(timeTableData[i]);
             }
-
+            currentTime = currentTime.AddDays(1);
             for (int i = 0; i < timeTableData.Count; i++)
             {
                 if (timeTableData[i].GetDepartureTime() > time.AddHours(maximumWeightingTime)) break;
+                if (!timeTableData[i].TripIsRunning(DateOnly.FromDateTime(currentTime), calendars, calendarDates)) continue;
                 tripsInTimeFrame.Add(timeTableData[i]);
             }
         }
@@ -45,6 +48,7 @@ public class TimeTable
             {
                 if (timeTableData[i].GetDepartureTime() < time) continue;
                 if (timeTableData[i].GetDepartureTime() > time.AddHours(maximumWeightingTime)) continue;
+                if (!timeTableData[i].TripIsRunning(DateOnly.FromDateTime(currentTime), calendars, calendarDates)) continue;
                 tripsInTimeFrame.Add(timeTableData[i]);
             }
         }

@@ -35,12 +35,12 @@ public class Reader
                 line = streamReader.ReadLine();
             }
         }
+        Console.WriteLine("Stops read.");
         return _stops;
     }
 
     public Dictionary<string, List<StopTime>> ReadStopTimes()
     {
-        
         using (StreamReader streamReader = new StreamReader(_baseDirectory + "stop_times.txt"))
         {
             string[] keys = streamReader.ReadLine()!.ToValuesFromCsvLine();
@@ -59,6 +59,7 @@ public class Reader
                 line = streamReader.ReadLine();
             }
         }
+        Console.WriteLine("StopTimes read");
         return _stopTimes;
     }
 
@@ -76,6 +77,7 @@ public class Reader
                 line = streamReader.ReadLine();
             }
         }
+        Console.WriteLine("Transfers read");
         return _transfers;
     }
 
@@ -93,6 +95,7 @@ public class Reader
                 line = streamReader.ReadLine();
             }
         }
+        Console.WriteLine("Calendars read");
         return _calendars;
     }
 
@@ -165,7 +168,9 @@ public class Reader
                 line = streamReader.ReadLine();
             }
         }
+        Console.WriteLine("Routes Read");
         return _routes;
+        
     }
 
     public void ReadAll()
@@ -186,5 +191,10 @@ public class Reader
         Console.WriteLine("Agencies read");
         ReadRoutes();
         Console.WriteLine("Routes read");
+    }
+
+    public Dictionary<string, Stop> GetStops()
+    {
+        return _stops;
     }
 }

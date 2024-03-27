@@ -9,8 +9,13 @@ public class TimeTableTrip
 
     public string GetIdentString(Dictionary<string, Stop> stops)
     {
-        return route.route_short_name + intermediateStops[0].departure_time +
+        return route.route_short_name + departureTime +
                stops[intermediateStops[^1].stop_id].stop_name;
+    }
+
+    public string GetIdentStringSimple()
+    {
+        return route.route_short_name + intermediateStops[^1].stop.parentStop.stop_name;
     }
     public TimeTableTrip(List<StopTime> intermediateStops, Route route, Trip trip)
     {
@@ -36,9 +41,14 @@ public class TimeTableTrip
         {
             foreach (CalendarDate calendarDate in calendarDates[trip.service_id])
             {
-                if (calendarDate.date == date) return calendarDate.exception_type;
+                if (calendarDate.date == date)
+                {
+                    return calendarDate.exception_type;
+                }
             }
         }
+
+        if (!calendars.ContainsKey(this.trip.service_id)) return false;
         return calendars[this.trip.service_id].isRunningOnDay(date);
     }
 

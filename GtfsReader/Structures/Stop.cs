@@ -48,7 +48,7 @@ public class Stop
                 case "stop_lon":
                     this.GetType().GetProperty(keys[i]).SetValue(this, double.Parse(values[i].Replace('.',','))); break;
                 case "location_type":
-                case "wheelcharair_boarding":
+                case "wheelchair_boarding":
                     if (values[i] == "") values[i] = "100";
                     this.GetType().GetProperty(keys[i]).SetValue(this, byte.Parse(values[i])); break;
                 case "level_id":

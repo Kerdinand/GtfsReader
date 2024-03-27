@@ -22,6 +22,7 @@ public class Transfer
                 case "transfer_type":
                     this.GetType().GetProperty(keys[i]).SetValue(this, byte.Parse(values[i])); break;
                 case "min_transfer_time":
+                    if (values[i] == "") values[i] = "120";
                     this.GetType().GetProperty(keys[i]).SetValue(this, ushort.Parse(values[i])); break;
                 default:
                     this.GetType().GetProperty(keys[i]).SetValue(this, values[i]); break;

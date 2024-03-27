@@ -29,6 +29,32 @@ public class Raptor
         _calendarDates = calendarDates;
         _transfers = transfers;
         _routes = routes;
+        SetNearbyStops();
+        Console.WriteLine("Thread 1 started");
+        Console.WriteLine("Data for raptor is set");
+        SetIntermediateStops();
+        Console.WriteLine("Intermediate Stops set");
+        AddTransferStops();
+        Console.WriteLine("Add transfers set");
+        CreateTimeTables();
+        Console.WriteLine("Timetables set");
+        SetParentStops();
+        Console.WriteLine("Parent stops set");
+        SortAllTimeTableTrips();
+        Console.WriteLine("Timetable sorted");
+        SetStopsToStopTimes();
+        Console.WriteLine("Nearby stops set");
+        Console.WriteLine("finished");
+    }
+    public Raptor(Reader reader)
+    {
+        _stops = reader.ReadStops();
+        _trips = reader.ReadTrips();
+        _stopTimeLists = reader.ReadStopTimes();
+        _calendars = reader.ReadCalendars();
+        _calendarDates = reader.ReadCalendarDate();
+        _transfers = reader.ReadTransfers();
+        _routes = reader.ReadRoutes();
         SetIntermediateStops();
         AddTransferStops();
         CreateTimeTables();
@@ -37,6 +63,14 @@ public class Raptor
         SetStopsToStopTimes();
     }
 
+    private void SortAllTimeTableTrips()
+    {
+        foreach (Stop stop in _stops.Values)
+        {
+            stop.timeTable.SortTimeTableData();
+        }
+    }
+    
     private void SetStopsToStopTimes()
     {
         foreach (List<StopTime> stopTimes in _stopTimeLists.Values)
@@ -50,17 +84,38 @@ public class Raptor
     
     private void SetNearbyStops()
     {
+        /*
+        for (int i = 0; i < _stops.Count; i++)
+        {
+            if (i % 1000 == 0) Console.WriteLine("Check " + i);
+            for (int j = i + 1; j < _stops.Count; j++)
+            {
+                double time;
+                Stop stop1 = _stops.ElementAt(i).Value;
+                Stop stop2 = _stops.ElementAt(j).Value;
+                if ((time = Util.Util.CalculateDistance(stop1, stop2)) < 0.4)
+                {
+                    stop1.stopsCloseBy.Add(stop2);
+                    stop1.stopsCloseByTime.Add((int) (time * 17)+1);
+                    stop2.stopsCloseBy.Add(stop1);
+                    stop2.stopsCloseByTime.Add((int) (time * 17)+1);
+                }
+            }
+        }*/
+        int counter = 0;
         foreach (Stop stop in _stops.Values)
         {
+            if (counter % 1000 == 0) Console.WriteLine(((float)counter /_stops.Count));
+            counter++;
             foreach (Stop s in _stops.Values)
             {
                 if (s.Equals(stop)) continue;
                 if (s.parentStop == stop.parentStop) continue;
                 double time;
-                if ((time = Util.Util.CalculateDistance(stop, s)) < 0.6)
+                if ((time = Util.Util.CalculateDistance(stop, s)) < 0.25)
                 {
                     stop.stopsCloseBy.Add(s);
-                    stop.stopsCloseByTime.Add((int) (time * 17)+1);
+                    stop.stopsCloseByTime.Add((int) (time * 15));
                 }
             }
         }
@@ -116,7 +171,7 @@ public class Raptor
         {
             foreach (Stop stop in stopMain.children_stops)
             {
-                foreach (TimeTableTrip timeTableTrip in stop.timeTable.GetDepartingTrips(currentTime, maximumWaitingTime))
+                foreach (TimeTableTrip timeTableTrip in stop.timeTable.GetDepartingTrips(currentTime, maximumWaitingTime, _calendars, _calendarDates))
                 {
                     if (departures.Contains(timeTableTrip.GetIdentString(_stops))) continue;
                     runningTrips.Add(timeTableTrip);
@@ -129,7 +184,7 @@ public class Raptor
         {
             foreach (Stop stop in stopMain.parentStop.children_stops)
             {
-                foreach (TimeTableTrip timeTableTrip in stop.timeTable.GetDepartingTrips(currentTime, maximumWaitingTime))
+                foreach (TimeTableTrip timeTableTrip in stop.timeTable.GetDepartingTrips(currentTime, maximumWaitingTime, _calendars, _calendarDates))
                 {
                     if (departures.Contains(timeTableTrip.GetIdentString(_stops))) continue;
                     runningTrips.Add(timeTableTrip);
@@ -140,18 +195,50 @@ public class Raptor
         // Add all stops if stop is not a parent and also not contains children
         if (stopMain.parent_station == "" && stopMain.children_stops.Count == 0)
         {
-            foreach (TimeTableTrip timeTableTrip in stopMain.timeTable.GetDepartingTrips(currentTime, maximumWaitingTime))
+            foreach (TimeTableTrip timeTableTrip in stopMain.timeTable.GetDepartingTrips(currentTime, maximumWaitingTime, _calendars, _calendarDates))
             {
                 if (departures.Contains(timeTableTrip.GetIdentString(_stops))) continue;
                 runningTrips.Add(timeTableTrip);
                 departures.Add(timeTableTrip.GetIdentString(_stops));
             }
         }
-        
-        List<TimeTableTrip> result = runningTrips.ToList();
-        
-        result.Sort((TimeTableTrip a, TimeTableTrip b) => a.intermediateStops[0].arrival_time.CompareTo(b.intermediateStops[0].arrival_time));
 
+        List<TimeTableTrip> tmp = runningTrips.ToList();
+        tmp.Sort((TimeTableTrip a, TimeTableTrip b) => a.GetDepartureTime().CompareTo(b.GetDepartureTime()));
+        if (tmp.Count == 0) return tmp;
+        if (tmp[0].GetDepartureTime() < TimeOnly.FromDateTime(currentTime))
+        {
+            List<TimeTableTrip> nextDayDep = new List<TimeTableTrip>();
+            List<TimeTableTrip> thisDayDep = new List<TimeTableTrip>();
+            for (int i = 0; i < tmp.Count; i++)
+            {
+                if (tmp[i].GetDepartureTime() > TimeOnly.FromDateTime(currentTime))
+                {
+                    thisDayDep.Add(tmp[i]);
+                }
+                else
+                {
+                    nextDayDep.Add(tmp[i]);
+                }
+            }
+            tmp = thisDayDep.Concat(nextDayDep).ToList();
+        }
+        return tmp;
+    }
+
+    public List<TimeTableTrip> GetEarliestDepartingTrips(DateTime currentTime, int maximumWaitingTime, Stop stopMain)
+    {
+        List<TimeTableTrip> allDepartingTrips = GetDepartingTrips(currentTime, maximumWaitingTime, stopMain);
+        HashSet<string> filterSet = new HashSet<string>();
+        List<TimeTableTrip> result = new List<TimeTableTrip>();
+        foreach (TimeTableTrip trip in allDepartingTrips)
+        {
+            if (!filterSet.Contains(trip.GetIdentStringSimple()))
+            {
+                result.Add(trip);
+                filterSet.Add(trip.GetIdentStringSimple());
+            }
+        }
         return result;
     }
 
@@ -240,7 +327,7 @@ public class Raptor
                         if (currentStop.stop_id == start.stop_id) continue;
                         if (!isEarlierTime(currentStop.label.arrivalTime, stopTime.arrival_time, originalStartTime)) continue;
                         currentStop.label.arrivalTime = new DateTime(startTime.Year, startTime.Month, startTime.Day,
-                            stopTime.arrival_time.Hour, stopTime.arrival_time.Minute, stopTime.arrival_time.Second);
+                            stopTime.arrival_time.Hour, stopTime.arrival_time.Minute, stopTime.arrival_time.Second).AddMinutes(1);
                         if (currentStop.label.arrivalTime < originalStartTime)
                         {
                             currentStop.label.arrivalTime = currentStop.label.arrivalTime.AddDays(1);
@@ -277,7 +364,7 @@ public class Raptor
                     updatedStops.Add(stop);
                 }
             }
-
+            
             // Prüfe alle Stationen in Laufweite
             foreach (Stop stop in markedStops)
             {
@@ -294,18 +381,19 @@ public class Raptor
                     updatedStops.Add(stop);
                 }
             }
+            
             markedStops = new HashSet<Stop>(updatedStops);
             updatedStops.Clear();
         }
 
-        List<Stop> stopsNearEnd = GetStopsInVicinity(end.parentStop, 0.3);
+        List<Stop> stopsNearEnd = GetStopsInVicinity(end.parentStop, 1);
 
         foreach (Stop s in stopsNearEnd)
         {
             if (s.label.arrivalTime == DateTime.MaxValue) continue;
-            if (end.label.arrivalTime > s.label.arrivalTime.AddMinutes(Util.Util.CalculateDistance(end, s) * 10))
+            if (end.label.arrivalTime > s.label.arrivalTime.AddMinutes(Util.Util.CalculateDistance(end, s) * 15))
             {
-                end.label.arrivalTime = s.label.arrivalTime.AddMinutes(Util.Util.CalculateDistance(end, s) * 10);
+                end.label.arrivalTime = s.label.arrivalTime.AddMinutes(Util.Util.CalculateDistance(end, s) * 15);
                 end.label.origin = s;
                 end.label.exitTrip = null;
             }
@@ -315,7 +403,7 @@ public class Raptor
 
         if (end.label.origin == null) return result;
         int counter = 0;
-        while (end != null && counter < 99)
+        while (end != null && counter < numberOfRounds*2)
         {
             result.Add(end);
             if (end.parentStop.stop_id == start.parentStop.stop_id) break;
@@ -336,6 +424,7 @@ public class Raptor
 
     public string CreateResultString(List<Stop> result)
     {
+        if (result.Count == 0) return "no way";
         string tripInfo = "";
         tripInfo += result[0].label.departureTime + "- \n";
         for (int i = 0; i + 1 < result.Count; i++)

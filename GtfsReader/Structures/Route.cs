@@ -9,7 +9,7 @@ public class Route
     public string route_short_name { get; set; }
     public string route_long_name { get; set; }
     public string route_desc { get; set; }
-    public byte route_type { get; set; }
+    public ushort route_type { get; set; }
     public string route_url { get; set; }
     public string route_color { get; set; }
     public string route_text_color { get; set; }
@@ -24,11 +24,12 @@ public class Route
         {
             switch (keys[i])
             {
-                case "route_type":
+                
                 case "continuous_pickup":
                 case "continuous_drop_off":
                     this.GetType().GetProperty(keys[i]).SetValue(this, byte.Parse(values[i])); break;
                 case "route_sort_order":
+                case "route_type":
                     this.GetType().GetProperty(keys[i]).SetValue(this, ushort.Parse(values[i])); break;
                 default:
                     this.GetType().GetProperty(keys[i]).SetValue(this, values[i]); break;
