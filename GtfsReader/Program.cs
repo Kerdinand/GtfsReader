@@ -15,7 +15,8 @@ public class Program
         {
             Stop start = stops.ElementAt(new Random().Next(stops.Values.Count)).Value;
             Stop finish = stops.ElementAt(new Random().Next(stops.Count)).Value;
-            //Stop start = stops["000009066170"];
+            //Stop start = stops["de:08212:58:1:1"];
+            //Stop finish = stops["de:08235:424:1:1"];
             //List<TimeTableTrip> timeTableTrips = raptor.GetDepartingTrips(new DateTime(2024,04,17,22,00,00), 4, start);
             /*List<TimeTableTrip> timeTableTrips = raptor.GetEarliestDepartingTrips(DateTime.Now, 6, start);
             Console.WriteLine(start.stop_name);
@@ -26,7 +27,7 @@ public class Program
             }
             */
             Console.WriteLine($"Von {start.stop_name} nach {finish.stop_name}");
-            Console.WriteLine(raptor.CreateResultString(raptor.GetQuickestRoute(start, DateTime.Now, 3,2,finish)));
+            Console.WriteLine(raptor.CreateResultString(raptor.GetQuickestRoute(start, DateTime.Now, 4,1,finish)));
             
             Console.ReadLine();
         }
