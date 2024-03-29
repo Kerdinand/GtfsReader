@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Text.Json;
+using System.Xml;
 using GtfsReader.Structures;
 using GtfsReader.Structures.Raptor;
 
@@ -29,7 +30,7 @@ public class Raptor
         _calendarDates = calendarDates;
         _transfers = transfers;
         _routes = routes;
-        SetNearbyStops();
+        //SetNearbyStops();
         Console.WriteLine("Data for raptor is set");
         SetIntermediateStops();
         Console.WriteLine("Intermediate Stops set");
@@ -479,7 +480,6 @@ public class Raptor
             tripInfo += depTime + " - " + stop.stop_name + " -> " + nextStop.stop_name + " @" +
                         nextStop.label.arrivalTime + " using: " + line + "\n";
         }
-
         return tripInfo;
     }
 }

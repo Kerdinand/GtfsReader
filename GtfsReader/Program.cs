@@ -27,7 +27,7 @@ public class Program
             }
             */
             Console.WriteLine($"Von {start.stop_name} nach {finish.stop_name}");
-            Console.WriteLine(raptor.CreateResultString(raptor.GetQuickestRoute(start, DateTime.Now, 4,1,finish)));
+            Console.WriteLine(raptor.CreateResultString(raptor.GetQuickestRoute(start, DateTime.Now, 2,1,finish)));
             
             Console.ReadLine();
         }
